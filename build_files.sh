@@ -2,5 +2,5 @@
 pip install -r requirements.txt
 
 # make migrations
-python3.11.2 manage.py migrate
-python3.11.2 manage.py collectstatic
+py manage.py migrate
+py manage.py collectstatic
