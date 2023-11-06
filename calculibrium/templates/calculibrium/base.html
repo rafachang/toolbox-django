@@ -23,7 +23,7 @@
                   Comercial
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{% url 'calculibrium:structure' %}">Estrutura</a></li>
+                  <li><a class="dropdown-item" href="{% url 'calculibrium:structure_kwp' %}">Estrutura</a></li>
                 </ul>
               </li>
               <li class="nav-item dropdown">
@@ -31,8 +31,8 @@
                   Engenharia
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Estrutura [kWp]</a></li>
-                  <li><a class="dropdown-item" href="#">Estrutura [Un]</a></li>
+                  <li><a class="dropdown-item" href="{% url 'calculibrium:structure_kwp' %}">Estrutura [kWp]</a></li>
+                  <li><a class="dropdown-item" href="{% url 'calculibrium:structure_un' %}">Estrutura [Un]</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="#">Mesas</a></li>
                   <li><hr class="dropdown-divider"></li>

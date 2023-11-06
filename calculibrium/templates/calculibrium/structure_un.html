@@ -1,0 +1,293 @@
+{% extends "calculibrium/base.html" %}
+{% load calculibrium_extras %}
+{% block title %}
+  Calculo de Estrutura
+{% endblock title %}
+
+{% block content %}
+<div class="container">
+<form method="post">
+    {% csrf_token %}
+    <div class="card" style="width: 80rem;">
+        <h3 class="card-header">Selecione as Mesas</h3>
+        <div class="card-body">
+            <div class="container" id="linhas-container">
+                {% if tables %}
+                {% for row in tables %}
+                    <div class="mesas">
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="txt_modules_amount" class="form-label">Módulos</label>
+                                    <input type="number" step="1" class="form-control" name="txt_modules_amount" id="txt_modules_amount" value="{{row.0}}">
+                                    <div class="form-text">Insira a Quantidade total de Módulos na mesa.</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="txt_tables_amount" class="form-label">Mesas</label>
+                                    <input type="number" step="1" class="form-control" name="txt_tables_amount" id="txt_tables_amount" value="{{row.1}}">
+                                    <div class="form-text">Insira a Quantidade de mesas iguais.</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="mb-3">
+                                    <br>
+                                    {% if forloop.counter0 == 0 %}
+                                        <button type="button" id="adicionar-linha" class="btn btn-outline-success btn-lg">+</button>
+                                        {% else %}
+                                        <button type="button" id="remover-linha" class="btn btn-outline-danger btn-lg">-</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                    <div class="mesas">
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="txt_modules_amount" class="form-label">Módulos</label>
+                                    <input type="number" step="1" class="form-control" name="txt_modules_amount" id="txt_modules_amount" value="">
+                                    <div class="form-text">Insira a Quantidade total de Módulos na mesa.</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="txt_tables_amount" class="form-label">Mesas</label>
+                                    <input type="number" step="1" class="form-control" name="txt_tables_amount" id="txt_tables_amount" value="">
+                                    <div class="form-text">Insira a Quantidade de mesas iguais.</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="mb-3">
+                                    <br>
+                                    <button type="button" id="adicionar-linha" class="btn btn-outline-success btn-lg">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="card" style="width: 80rem;">
+        <h3 class="card-header">Entradas da Usina</h3>
+        <div class="card-body">
+            <div class="container">
+                <div class="row">
+                  <div class="mb-3">
+                    <label for="txt_customers_name" class="form-label">Nome do Cliente</label>
+                    <input type="text" class="form-control" name="txt_customers_name" value="{{power_plant.customer}}">
+                    <div class="form-text">Insira o Nome do Cliente.</div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <div class="mb-3">
+                      <label for="txt_module_width" class="form-label">Largura do Modulo</label>
+                      <input type="number" step="1" class="form-control" name="txt_module_width" value="{{power_plant.module.largura}}">
+                      <div class="form-text">Insira a Largura do Módulo (lado menor).</div>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="mb-3">
+                      <label for="txt_module_power" class="form-label">Potência do Modulo</label>
+                      <input type="number" step="1" class="form-control" name="txt_module_power" value="{{power_plant.module.potencia}}">
+                      <div class="form-text">Insira a Potencia do Módulo [W].</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="mb-3 form-check">              
+                    {% if power_plant.inverter_table %}
+                      <input type="checkbox" class="form-check-input" name="chk_inverter" value="inverter_table" checked>                
+                    {% else %}
+                      <input type="checkbox" class="form-check-input" name="chk_inverter" value="inverter_table">                
+                    {% endif %}
+                      <label class="form-check-label" for="chk_inverter">Inversor instalado na Mesa</label>
+                  </div>
+                </div>
+              </div>
+        </div>
+    </div>
+    <div class="card" style="width: 80rem;">
+        <h3 class="card-header">Concreto</h3>
+        <div class="card-body">
+          <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="mb-3">
+                        <label for="txt_height_buried" class="form-label">Altura da Base Enterrada</label>
+                        <input type="number" step="0.01" class="form-control" name="txt_height_buried" id="txt_height_buried" value="1.6" disabled>
+                        <div id="lbl_height_buried" class="form-text">Insira a Altura da Base Enterrada.</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="mb-3">
+                        <label for="txt_ray_buried" class="form-label">Raio da Base Enterrada</label>
+                        <input type="number" step="0.01" class="form-control" name="txt_ray_buried" id="txt_ray_buried" value="0.15" disabled>
+                        <div id="lbl_ray_buried" class="form-text">Insira o Raio da Base Enterrada.</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="mb-3">
+                        <label for="txt_volume_buried" class="form-label">Calculo m³</label>
+                        <input type="number" step="0.01" class="form-control" name="txt_volume_buried" id="txt_volume_buried" value="{{power_plant.volume_buried|floatformat:3}}" placeholder="0.00" disabled>
+                        <div id="lbl_volume_buried" class="form-text">Resultado Calculo m³.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="mb-3">
+                        <label for="txt_height_exposed" class="form-label">Altura da Base Exposta</label>
+                        <input type="number" step="0.01" class="form-control" name="txt_height_exposed" id="txt_height_exposed" value="0.4" disabled>
+                        <div id="lbl_height_exposed" class="form-text">Insira a Altura da Base Exposta.</div>
+                    </div>
+                </div>
+                <div class="col">
+                  <div class="mb-3">
+                    <label for="txt_ray_exposed" class="form-label">Raio da Base Exposta</label>
+                    <input type="number" step="0.01" class="form-control" name="txt_ray_exposed" id="txt_ray_exposed" value="0.2" disabled>
+                    <div id="lbl_ray_exposed" class="form-text">Insira o Raio da Base Exposta.</div>
+                </div>
+                </div>
+                <div class="col">
+                <div class="mb-3">
+                    <label for="txt_volume_exposed" class="form-label">Calculo m³</label>
+                    <input type="number" step="0.01" class="form-control" name="txt_volume_exposed" id="txt_volume_exposed" value="{{power_plant.volume_exposed|floatformat:3}}" placeholder="0.00" disabled>
+                    <div id="lbl_volume_exposed" class="form-text">Resultado Calculo m³.</div>
+                </div>
+                </div>
+            </div>
+            <div class="row">
+                <button type="submit" name="calculate" class="btn btn-primary">Submit</button>
+            </div>  
+          </div>
+        </div>
+    </div>
+</form>
+{% if power_plant.structures %}
+<div class="card" style="width: 80rem;">
+  <h3 class="card-header">Outputs</h3>
+  <div class="card-body">
+    <div class="container">
+      <div class="row">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Descrição</th>
+              <th scope="col">Quantidade</th>
+              <th scope="col">Unidade</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Potência da Usina</td>
+              <td>{{power_plant.real_power}}</td>
+              <td>kWp</td>
+            </tr>
+            <tr>
+              <td>Quantidade Total de Módulos</td>
+              <td>{{power_plant.modules_amount}}</td>
+              <td>un</td>
+            </tr>
+            {% for qtd_modulo, qtd_table in power_plant.array_tables %}
+              <tr>
+                <td>Mesa de {{qtd_modulo}} Módulos</td>
+                <td>{{qtd_table}}</td>
+                <td>un</td>
+              </tr>
+            {% endfor %}
+            <tr>
+              <td>Volume Total de Concreto (H21)</td>
+              <td>{{power_plant.volume_total}}</td>
+              <td>m³</td>
+            </tr>
+            <tr>
+              <td>Quantidade total de Bases</td>
+              <td>{{power_plant.bases}}</td>
+              <td>un</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Código</th>
+              <th scope="col">Descrição</th>
+              {% for i in power_plant.array_tables %}
+                <th>Quantidade</th>
+              {% endfor %}
+              <th scope="col">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for key, value in power_plant.structure_total.bom.items %}
+              <tr>
+                <th>{{key}}</th>
+                <th>{{value.descricao}}</th>
+                {% for i in power_plant.structures %}
+                <th>{{i.bom|dictKeyLookupQuantidade:key}}</th>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <button type="submit" name="export" class="btn btn-primary">Exportar</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+</div>
+<script>
+    var linhasContainer = document.getElementById('linhas-container');
+
+    linhasContainer.addEventListener('click', function(event) {
+        // Verifica se o elemento clicado é um botão de remoção
+        if (event.target.id === 'adicionar-linha') {
+            // Obtém o elemento pai (div com a classe 'mesas') do botão clicado
+            var novaLinha = document.createElement('div');
+            novaLinha.classList.add('mesas');
+            novaLinha.innerHTML = `
+                <div class="row">
+                    <div class="col">
+                        <div class="mb-3">
+                            <label for="txt_modules_amount" class="form-label">Módulos</label>
+                            <input type="number" step="1" class="form-control" name="txt_modules_amount" value="">
+                            <div class="form-text">Insira a Quantidade total de Módulos na mesa.</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="mb-3">
+                            <label for="txt_tables_amount" class="form-label">Mesas</label>
+                            <input type="number" step="1" class="form-control" name="txt_tables_amount" value="">
+                            <div class="form-text">Insira a Quantidade de mesas iguais.</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-1">
+                        <div class="mb-3">
+                            <br>
+                            <button type="button" id="remover-linha" class="btn btn-outline-danger btn-lg">-</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            linhasContainer.appendChild(novaLinha);
+        }
+        if (event.target.id === 'remover-linha') {
+            // Obtém o elemento pai (div com a classe 'mesas') do botão clicado
+            var linhaRemovida = event.target.closest('.mesas');
+            // Remove a linha do DOM
+            linhaRemovida.remove();
+        }
+    });
+</script>
+{% endblock content %}
