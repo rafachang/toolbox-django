@@ -1,0 +1,21 @@
+{% extends "calculibrium/base.html" %}
+
+{% block title %}
+  Lista de 
+{% endblock title %}
+
+{% block content %}
+<center>
+    <div class="card" style="width: 70%;">
+        <ul class="list-group list-group-flush">
+            {% for item in list %}
+                <li class="list-group-item">{{item.cdcrm}} - {{item}}</li>
+            {% endfor %}
+            <!-- <li class="list-group-item">Componente 1</li>
+            <li class="list-group-item">Componente 2</li>
+            <li class="list-group-item">Componente 3</li>
+            <li class="list-group-item">Componente 4</li> -->
+        </ul>
+    </div>
+</center>
+{% endblock content %}
