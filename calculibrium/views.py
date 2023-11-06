@@ -65,3 +65,7 @@ def structure_un(request: WSGIRequest):
         })
 
     return render(request, "calculibrium/structure_un.html", {"power_plant": power_plant})
+
+def cable_ac(request: WSGIRequest):
+    return render(request, 'calculibrium/cable_ac.html')
+
