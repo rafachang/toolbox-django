@@ -17,10 +17,10 @@
               <option value="{{marca.id}}">{{marca.name}}</option>
             {% endfor %}
         </select>
-        <select class="form-select form-select-lg mb-3" id="marca" aria-label="Large select example">
+        <select class="form-select form-select-lg mb-3" id="componente" aria-label="Large select example">
             <option value="" selected>Selecione um componente</option>
             {% for componente in componentes %}
-              <option value="{{componente.id}}">{{componente.descricao}}</option>
+              <option class="componente-option" data-marca="{{componente.brand.id}}" value="{{componente.id}}">{{componente.descricao}}</option>
             {% endfor %}
         </select>
     </div>
@@ -29,8 +29,8 @@
     $document.ready(function(){
         $('#marca').change(function(){
             var marcaId = $(this).val();
-            $('.produto-option').hide();
-            $('.produto-option[data-marca="' + marcaId + '"]').show();
+            $('.componente-option').hide();
+            $('.componente-option[data-marca="' + marcaId + '"]').show();
         })
     });
 </script>
