@@ -7,8 +7,7 @@ from django.views import generic
 
 from calculibrium.model.power_plant import PowerPlant
 from calculibrium.model.component import Module
-
-from .models import DBComponent
+from .models import DBComponent, DBBrand
 
 def index(request: WSGIRequest):
     return render(request, "calculibrium/index.html")
@@ -67,5 +66,7 @@ def structure_un(request: WSGIRequest):
     return render(request, "calculibrium/structure_un.html", {"power_plant": power_plant})
 
 def cable_ac(request: WSGIRequest):
-    return render(request, 'calculibrium/cable_ac.html')
+    marcas = DBBrand.objects.all()
+    componentes = DBComponent.objects.all()
+    return render(request, 'calculibrium/cable_ac.html', {'marcas': marcas, 'componentes': componentes})
 

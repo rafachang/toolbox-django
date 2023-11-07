@@ -9,9 +9,21 @@
 {% endblock head %}
 
 {% block content %}
-    <div class="container">
-        <div class="card" style="width: 90%;">
-
-        </div>
+<div class="container">
+    <div class="card" style="width: 90%;">
+        <select class="form-select form-select-lg mb-3" id="marca" aria-label="Large select example">
+            <option value="" selected>Selecione uma marca</option>
+            {% for marca in marcas %}
+              <option value="{{marca.id}}">{{marca.name}}</option>
+            {% endfor %}
+        </select>
+        <select class="form-select form-select-lg mb-3" id="marca" aria-label="Large select example">
+            <option value="" selected>Selecione um componente</option>
+            {% for produto in produtos %}
+              <option value="{{produto.id}}">{{produto.name}}</option>
+            {% endfor %}
+        </select>
     </div>
+</div>
+
 {% endblock content %}
