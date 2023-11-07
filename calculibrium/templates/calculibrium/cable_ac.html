@@ -20,7 +20,7 @@
         <select class="form-select form-select-lg mb-3" id="marca" aria-label="Large select example">
             <option value="" selected>Selecione um componente</option>
             {% for componente in componentes %}
-              <option value="{{componente.id}}">{{componente.name}}</option>
+              <option value="{{componente.id}}">{{componente.descricao}}</option>
             {% endfor %}
         </select>
     </div>
