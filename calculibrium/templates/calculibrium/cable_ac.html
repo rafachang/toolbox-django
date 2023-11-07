@@ -19,11 +19,19 @@
         </select>
         <select class="form-select form-select-lg mb-3" id="marca" aria-label="Large select example">
             <option value="" selected>Selecione um componente</option>
-            {% for produto in produtos %}
-              <option value="{{produto.id}}">{{produto.name}}</option>
+            {% for componente in componentes %}
+              <option value="{{componente.id}}">{{componente.name}}</option>
             {% endfor %}
         </select>
     </div>
 </div>
-
+<script>
+    $document.ready(function(){
+        $('#marca').change(function(){
+            var marcaId = $(this).val();
+            $('.produto-option').hide();
+            $('.produto-option[data-marca="' + marcaId + '"]').show();
+        })
+    });
+</script>
 {% endblock content %}
