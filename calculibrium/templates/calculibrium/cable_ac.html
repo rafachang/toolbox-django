@@ -25,8 +25,6 @@
     var cboMarca = document.getElementById('select-marca');
     var cboComponentes = document.getElementById('select-componente');
     for(var i = 0; i < jsonMarcas.length; i++){
-        // console.log(jsonMarcas[i].pk)
-        // console.log(jsonMarcas[i].fields.name)
         var option = document.createElement('option');
         option.value = jsonMarcas[i].pk;
         option.text = jsonMarcas[i].fields.name;
@@ -34,18 +32,12 @@
     }
     cboMarca.addEventListener('change', function(event){
         var selectedOption = event.target.options[event.target.selectedIndex];
-        var selectedValue = selectedOption.value;
-        var selectedText = selectedOption.text;
-        // console.log("Selected Option: " + selectedOption);
-        // console.log("Selected Value: " + selectedValue);
-        // console.log("Selected Text: " + selectedText);
         if (cboComponentes.hasChildNodes){
             while (cboComponentes.firstChild){
                 cboComponentes.removeChild(cboComponentes.firstChild);
             }
         }
         for(var i = 0; i < jsonComponentes.length; i++){
-            console.log(jsonComponentes[i].fields.brand, jsonComponentes[i].fields.descricao);
             if(jsonComponentes[i].fields.brand == selectedOption.value){
                 var option = document.createElement('option');
                 option.value = jsonComponentes[i].pk;
