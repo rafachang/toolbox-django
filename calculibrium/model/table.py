@@ -1,5 +1,9 @@
 import math
-from calculibrium.model.component import Module
+import pandas as pd
+if __name__ == '__main__':
+    from component import Module
+else:
+    from calculibrium.model.component import Module
 
 
 class Table:
@@ -73,16 +77,47 @@ class Table:
             return closest
 
     def calc_grounding(self):
-        ring_width = self.tables['dimensions'][0]+2e3
+        # ring_width = self.tables['dimensions'][0]+2e3
         ring_length = self.tables['dimensions'][1]+2e3
-        ring_perimeter = 2*(ring_length+ring_width)
-        middle_connections = math.ceil(sum(self.tables['qtd_mesas'])/3) if sum(self.tables['qtd_mesas']) >= 3 else 0
-        self.cable_length = ring_perimeter+middle_connections*ring_length
-        self.electrode = (middle_connections+2)*math.floor(ring_length/1e4)+(sum(self.tables['qtd_mesas'])-1)*2+4
+        print(self.tables)
+        rows_amount = math.ceil(sum(self.tables['qtd_mesas'])/2)
+        print('rows_amount:', rows_amount)
+        self.cable_length = (rows_amount*ring_length/1e3)+(sum(self.tables['qtd_mesas'])-2 if sum(self.tables['qtd_mesas']) > 2 else 0)*12
+        print('cable_length: ', self.cable_length)
+        self.electrode = math.ceil(ring_length/12e3)*rows_amount
+        print('electrode: ', self.electrode)
+        self.elcectodes_connector = self.electrode
+        print('elcectodes_connector: ', self.elcectodes_connector)
+        self.foundation_connector = self.elcectodes_connector-rows_amount
+        print('foundation_connector: ', self.foundation_connector)
+        self.splitbolt = self.electrode
+        print('splitbolt: ', self.splitbolt)
+        # ring_length = self.tables['dimensions'][1]+2e3
+        # ring_perimeter = 2*(ring_length+ring_width)
+        # middle_connections = math.ceil(sum(self.tables['qtd_mesas'])/3) if sum(self.tables['qtd_mesas']) >= 3 else 0
+        # self.cable_length = ring_perimeter+middle_connections*ring_length
+        # self.electrode = (middle_connections+2)*math.floor(ring_length/1e4)+(sum(self.tables['qtd_mesas'])-1)*2+4
 
     def __str__(self) -> str:
         return 'módulos: '+str(self.tables['qtd_modulo'])+'\nmesas: '+str(self.tables['qtd_mesas'])
-    
+        
 if __name__ == '__main__':
-    table = Table(Module(0,0,0,0,0,0,0,0,540,2261,1134,35,0,0,0,0), 300)
-    print(table.tables)
+    # table = Table(Module(0,0,0,0,0,0,0,0,540,2261,1134,35,0,0,0,0), 699*3)
+    arr = []
+    for i in range(700):
+        dict = {}
+        table = Table(Module(0,0,0,0,0,0,0,0,540,2261,1134,35,0,0,0,0), i*3)
+        dict['power_power_plant'] = round(540*3*i/1e3, 2)
+        dict['total_modules'] = 3*i
+        dict['modules_amount'] = table.tables['qtd_modulo']
+        dict['tables_display'] = table.tables['qtd_mesas']
+        dict['tables_amount'] = sum(table.tables['qtd_mesas'])
+        dict['cable_length'] = table.cable_length
+        dict['electrode'] = table.electrode
+        dict['elcectodes_connector'] = table.elcectodes_connector
+        dict['foundation_connector'] = table.foundation_connector
+        dict['splitbolt'] = table.splitbolt
+        arr.append(dict)
+    df = pd.DataFrame(arr)
+    print(df)
+    df.to_csv('grounding.csv')

@@ -1,9 +1,8 @@
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404
 from django.core.handlers.wsgi import WSGIRequest
+from django.core import serializers
 from django.core.exceptions import FieldError
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from django.views import generic
+from django.shortcuts import render
 
 from calculibrium.model.power_plant import PowerPlant
 from calculibrium.model.component import Module
@@ -67,6 +66,8 @@ def structure_un(request: WSGIRequest):
 
 def cable_ac(request: WSGIRequest):
     marcas = DBBrand.objects.all()
-    componentes = DBComponent.objects.all()
-    return render(request, 'calculibrium/cable_ac.html', {'marcas': marcas, 'componentes': componentes})
+    componentes = DBComponent.objects.filter(categoria_componente='IN')
+    marcas_json = serializers.serialize('json', marcas)
+    componentes_json = serializers.serialize('json', componentes)
+    return render(request, 'calculibrium/cable_ac.html', {'marcas': marcas, 'componentes': componentes, 'marcas_json': marcas_json, 'componentes_json': componentes_json})
 

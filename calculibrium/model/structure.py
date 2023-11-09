@@ -1,6 +1,8 @@
 import math
-from calculibrium.model.component import Module
-
+if not __name__ == "__main__":
+    from calculibrium.model.component import Module
+else:
+    from component import Module
 class Structure():
     def __init__(self, module: Module, module_amount: int, table_amount, inverter_table) -> None:
         self.module = module
@@ -99,6 +101,6 @@ class Structure():
     def calc_bases(self):
         self.bases = self.bom['5603112']['quantidade']*2
 
-#if __name__ == "__main__":
-#    obj = Structure(1048,300,1,False)
-#    print(obj.get_bill())
+# if __name__ == "__main__":
+#    obj = Structure(Module(0,0,0,0,0,0,0,0,445,2108,1048,40,0,0,0,0),51,1,False)
+#    print(obj.bom)

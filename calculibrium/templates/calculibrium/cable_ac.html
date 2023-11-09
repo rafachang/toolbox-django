@@ -11,27 +11,48 @@
 {% block content %}
 <div class="container">
     <div class="card" style="width: 90%;">
-        <select class="form-select form-select-lg mb-3" id="marca" aria-label="Large select example">
+        <select class="form-select form-select-lg mb-3" id="select-marca" aria-label="Large select example">
             <option value="" selected>Selecione uma marca</option>
-            {% for marca in marcas %}
-              <option value="{{marca.id}}">{{marca.name}}</option>
-            {% endfor %}
         </select>
-        <select class="form-select form-select-lg mb-3" id="componente" aria-label="Large select example">
+        <select class="form-select form-select-lg mb-3" id="select-componente" aria-label="Large select example">
             <option value="" selected>Selecione um componente</option>
-            {% for componente in componentes %}
-              <option class="componente-option" data-marca="{{componente.brand.id}}" value="{{componente.id}}">{{componente.descricao}}</option>
-            {% endfor %}
         </select>
     </div>
 </div>
 <script>
-    $document.ready(function(){
-        $('#marca').change(function(){
-            var marcaId = $(this).val();
-            $('.componente-option').hide();
-            $('.componente-option[data-marca="' + marcaId + '"]').show();
-        })
+    var jsonMarcas = JSON.parse('{{marcas_json | escapejs }}');
+    var jsonComponentes = JSON.parse('{{componentes_json | escapejs }}');
+    var cboMarca = document.getElementById('select-marca');
+    var cboComponentes = document.getElementById('select-componente');
+    for(var i = 0; i < jsonMarcas.length; i++){
+        // console.log(jsonMarcas[i].pk)
+        // console.log(jsonMarcas[i].fields.name)
+        var option = document.createElement('option');
+        option.value = jsonMarcas[i].pk;
+        option.text = jsonMarcas[i].fields.name;
+        cboMarca.appendChild(option);
+    }
+    cboMarca.addEventListener('change', function(event){
+        var selectedOption = event.target.options[event.target.selectedIndex];
+        var selectedValue = selectedOption.value;
+        var selectedText = selectedOption.text;
+        // console.log("Selected Option: " + selectedOption);
+        // console.log("Selected Value: " + selectedValue);
+        // console.log("Selected Text: " + selectedText);
+        if (cboComponentes.hasChildNodes){
+            while (cboComponentes.firstChild){
+                cboComponentes.removeChild(cboComponentes.firstChild);
+            }
+        }
+        for(var i = 0; i < jsonComponentes.length; i++){
+            console.log(jsonComponentes[i].fields.brand, jsonComponentes[i].fields.descricao);
+            if(jsonComponentes[i].fields.brand == selectedOption.value){
+                var option = document.createElement('option');
+                option.value = jsonComponentes[i].pk;
+                option.text = jsonComponentes[i].fields.descricao;
+                cboComponentes.appendChild(option);
+            }
+        }
     });
 </script>
 {% endblock content %}
