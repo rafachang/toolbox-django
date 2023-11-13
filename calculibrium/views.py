@@ -64,10 +64,12 @@ def structure_un(request: WSGIRequest):
 
     return render(request, "calculibrium/structure_un.html", {"power_plant": power_plant})
 
-def cable_ac(request: WSGIRequest):
-    marcas = DBBrand.objects.all()
-    componentes = DBComponent.objects.filter(categoria_componente='IN')
+def select(request: WSGIRequest, categoria_componente):
+    componentes = DBComponent.objects.filter(categoria_componente=categoria_componente)
+    marcas = DBBrand.objects.filter(dbcomponent__in=componentes).distinct()
     marcas_json = serializers.serialize('json', marcas)
     componentes_json = serializers.serialize('json', componentes)
-    return render(request, 'calculibrium/cable_ac.html', {'marcas': marcas, 'componentes': componentes, 'marcas_json': marcas_json, 'componentes_json': componentes_json})
+    if request.method == 'POST':
+        print(request.POST.getlist('container-inverters'))
+    return render(request, 'calculibrium/cable_ac.html', {'marcas_json': marcas_json, 'componentes_json': componentes_json})
 

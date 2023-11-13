@@ -11,40 +11,78 @@
 {% block content %}
 <div class="container">
     <div class="card" style="width: 90%;">
-        <select class="form-select form-select-lg mb-3" id="select-marca" aria-label="Large select example">
-            <option value="" selected>Selecione uma marca</option>
-        </select>
-        <select class="form-select form-select-lg mb-3" id="select-componente" aria-label="Large select example">
-            <option value="" selected>Selecione um componente</option>
-        </select>
+        <br>
+        <div class="container" name="container-inverters" id="linhas-container">
+        </div>
     </div>
 </div>
 <script>
-    var jsonMarcas = JSON.parse('{{marcas_json | escapejs }}');
-    var jsonComponentes = JSON.parse('{{componentes_json | escapejs }}');
-    var cboMarca = document.getElementById('select-marca');
-    var cboComponentes = document.getElementById('select-componente');
-    for(var i = 0; i < jsonMarcas.length; i++){
-        var option = document.createElement('option');
-        option.value = jsonMarcas[i].pk;
-        option.text = jsonMarcas[i].fields.name;
-        cboMarca.appendChild(option);
-    }
-    cboMarca.addEventListener('change', function(event){
-        var selectedOption = event.target.options[event.target.selectedIndex];
-        if (cboComponentes.hasChildNodes){
-            while (cboComponentes.firstChild){
-                cboComponentes.removeChild(cboComponentes.firstChild);
-            }
+    const marcas = JSON.parse('{{marcas_json | escapejs }}');
+    const linhasContainer = document.getElementById('linhas-container');
+    const componentes = JSON.parse('{{componentes_json | escapejs }}');
+
+    function adicionarLinha(btn_add_rem){
+        const divInverters = document.createElement('div');
+        divInverters.className = 'inversores';
+        const divRow = document.createElement('div');
+        divRow.className = 'row';
+        const divColBrand = document.createElement('div');
+        divColBrand.className = 'col';
+        const divColComponent = document.createElement('div');
+        divColComponent.className = 'col';
+        const marcaSelect = document.createElement('select');
+        marcaSelect.className = 'form-select form-select-lg mb-3';
+        const componentSelect = document.createElement('select');
+        componentSelect.className = 'form-select form-select-lg mb-3';
+        const divColBtn = document.createElement('div');
+        divColBtn.className = 'col-sm-1';
+        console.log(btn_add_rem);
+        if(btn_add_rem == 'add'){
+            divColBtn.innerHTML = '<button type="button" id="adicionar-linha" class="btn btn-outline-success btn-lg">+</button>';
+        }else{
+            divColBtn.innerHTML = '<button type="button" id="remover-linha" class="btn btn-outline-danger btn-lg">-</button>';
         }
-        for(var i = 0; i < jsonComponentes.length; i++){
-            if(jsonComponentes[i].fields.brand == selectedOption.value){
-                var option = document.createElement('option');
-                option.value = jsonComponentes[i].pk;
-                option.text = jsonComponentes[i].fields.descricao;
-                cboComponentes.appendChild(option);
-            }
+
+        marcaSelect.innerHTML = '<option value="" selected>Selecione uma marca</option>';
+        marcas.forEach(marca => {
+            const option = document.createElement('option');
+            option.text = marca.fields.name;
+            option.value = marca.pk;
+            marcaSelect.add(option)
+        });
+
+        marcaSelect.addEventListener('change', function() {
+            const marcaSelecionada = this.value;
+            componentSelect.innerHTML = '<option value="" selected>Selecione um componente</option>';
+            componentes.forEach(componente => {
+                console.log('brand: ', componente.fields.brand, '; marca: ', marcaSelecionada)
+                if(componente.fields.brand == marcaSelecionada){
+                    var option = document.createElement('option');
+                    option.text = componente.fields.descricao;
+                    option.value = componente.pk
+                    componentSelect.appendChild(option)
+                }
+            });
+        });
+        divColBrand.appendChild(marcaSelect);
+        divColComponent.appendChild(componentSelect);
+        divRow.appendChild(divColBrand);
+        divRow.appendChild(divColComponent);
+        divRow.appendChild(divColBtn);
+        divInverters.appendChild(divRow);
+        linhasContainer.appendChild(divInverters);
+    }
+    adicionarLinha('add');
+    linhasContainer.addEventListener('click', function(event) {
+        if (event.target.id === 'remover-linha') {
+            // Obtém o elemento pai (div com a classe 'mesas') do botão clicado
+            var linhaRemovida = event.target.closest('.inversores');
+            // Remove a linha do DOM
+            linhaRemovida.remove();
         }
     });
+    document.getElementById('adicionar-linha').addEventListener('click', adicionarLinha);
+    
 </script>
+
 {% endblock content %}

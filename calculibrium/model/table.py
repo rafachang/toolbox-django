@@ -77,26 +77,20 @@ class Table:
             return closest
 
     def calc_grounding(self):
-        # ring_width = self.tables['dimensions'][0]+2e3
-        ring_length = self.tables['dimensions'][1]+2e3
-        print(self.tables)
-        rows_amount = math.ceil(sum(self.tables['qtd_mesas'])/2)
-        print('rows_amount:', rows_amount)
-        self.cable_length = (rows_amount*ring_length/1e3)+(sum(self.tables['qtd_mesas'])-2 if sum(self.tables['qtd_mesas']) > 2 else 0)*12
-        print('cable_length: ', self.cable_length)
-        self.electrode = math.ceil(ring_length/12e3)*rows_amount
-        print('electrode: ', self.electrode)
-        self.elcectodes_connector = self.electrode
-        print('elcectodes_connector: ', self.elcectodes_connector)
-        self.foundation_connector = self.elcectodes_connector-rows_amount
-        print('foundation_connector: ', self.foundation_connector)
-        self.splitbolt = self.electrode
-        print('splitbolt: ', self.splitbolt)
+        ring_width = self.tables['dimensions'][0]+2e3
         # ring_length = self.tables['dimensions'][1]+2e3
-        # ring_perimeter = 2*(ring_length+ring_width)
-        # middle_connections = math.ceil(sum(self.tables['qtd_mesas'])/3) if sum(self.tables['qtd_mesas']) >= 3 else 0
-        # self.cable_length = ring_perimeter+middle_connections*ring_length
-        # self.electrode = (middle_connections+2)*math.floor(ring_length/1e4)+(sum(self.tables['qtd_mesas'])-1)*2+4
+        # rows_amount = math.ceil(sum(self.tables['qtd_mesas'])/2)
+        # self.joint = (sum(self.tables['qtd_mesas'])-2 if sum(self.tables['qtd_mesas']) > 2 else 0)
+        # self.cable_length = (rows_amount*ring_length/1e3)+self.joint*24
+        # self.electrode = math.ceil(ring_length/12e3)*rows_amount
+        ring_length = self.tables['dimensions'][1]+2e3
+        ring_perimeter = 2*(ring_length+ring_width)
+        middle_connections = math.ceil(sum(self.tables['qtd_mesas'])/3) if sum(self.tables['qtd_mesas']) >= 3 else 0
+        self.cable_length = (ring_perimeter+middle_connections*ring_length)/1e3
+        self.electrode = (middle_connections+2)*math.floor(ring_length/2e4)+(sum(self.tables['qtd_mesas'])-1)*2+4
+        self.elcectodes_connector = self.electrode
+        self.foundation_connector = self.elcectodes_connector-middle_connections
+        self.splitbolt = self.electrode
 
     def __str__(self) -> str:
         return 'módulos: '+str(self.tables['qtd_modulo'])+'\nmesas: '+str(self.tables['qtd_mesas'])
@@ -111,9 +105,11 @@ if __name__ == '__main__':
         dict['total_modules'] = 3*i
         dict['modules_amount'] = table.tables['qtd_modulo']
         dict['tables_display'] = table.tables['qtd_mesas']
+        dict['comprimento_mesa'] = table.tables['dimensions'][1]
+        dict['largura_mesa'] = table.tables['dimensions'][0]
         dict['tables_amount'] = sum(table.tables['qtd_mesas'])
-        dict['cable_length'] = table.cable_length
-        dict['electrode'] = table.electrode
+        dict['cobre_nu'] = table.cable_length
+        dict['haste'] = table.electrode
         dict['elcectodes_connector'] = table.elcectodes_connector
         dict['foundation_connector'] = table.foundation_connector
         dict['splitbolt'] = table.splitbolt
