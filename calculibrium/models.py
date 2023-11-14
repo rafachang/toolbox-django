@@ -1,5 +1,6 @@
 from audioop import reverse
 from django.db import models
+from django.forms.models import model_to_dict
 
 # Create your models here.
 
@@ -65,6 +66,9 @@ class DBComponent(models.Model):
     
     def get_absolute_url(self):
         return reverse("componente_detail", kwargs={"pk": self.pk})
+
+    def to_dict(self):
+        return model_to_dict(self)
 
 class DBCustomer(models.Model):
 

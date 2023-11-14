@@ -14,35 +14,35 @@
             <div class="container" id="linhas-container">
                 {% if tables %}
                 {% for row in tables %}
-                    <div class="mesas">
-                        <div class="row">
-                            <div class="col">
-                                <div class="mb-3">
-                                    <label for="txt_modules_amount" class="form-label">Módulos</label>
-                                    <input type="number" step="1" class="form-control" name="txt_modules_amount" id="txt_modules_amount" value="{{row.0}}">
-                                    <div class="form-text">Insira a Quantidade total de Módulos na mesa.</div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="mb-3">
-                                    <label for="txt_tables_amount" class="form-label">Mesas</label>
-                                    <input type="number" step="1" class="form-control" name="txt_tables_amount" id="txt_tables_amount" value="{{row.1}}">
-                                    <div class="form-text">Insira a Quantidade de mesas iguais.</div>
-                                </div>
-                            </div>
-                            <div class="col-sm-1">
-                                <div class="mb-3">
-                                    <br>
-                                    {% if forloop.counter0 == 0 %}
-                                        <button type="button" id="adicionar-linha" class="btn btn-outline-success btn-lg">+</button>
-                                        {% else %}
-                                        <button type="button" id="remover-linha" class="btn btn-outline-danger btn-lg">-</button>
-                                    {% endif %}
-                                </div>
-                            </div>
+                  <div class="mesas">
+                    <div class="row">
+                      <div class="col">
+                        <div class="mb-3">
+                          <label for="txt_modules_amount" class="form-label">Módulos</label>
+                          <input type="number" step="1" class="form-control" name="txt_modules_amount" id="txt_modules_amount" value="{{row.0}}">
+                          <div class="form-text">Insira a Quantidade total de Módulos na mesa.</div>
                         </div>
-                    </div>
-                  {% endfor %}
+                      </div>
+                      <div class="col">
+                        <div class="mb-3">
+                          <label for="txt_tables_amount" class="form-label">Mesas</label>
+                          <input type="number" step="1" class="form-control" name="txt_tables_amount" id="txt_tables_amount" value="{{row.1}}">
+                          <div class="form-text">Insira a Quantidade de mesas iguais.</div>
+                        </div>
+                      </div>
+                        <div class="col-sm-1">
+                          <div class="mb-3">
+                            <br>
+                            {% if forloop.counter0 == 0 %}
+                              <button type="button" id="adicionar-linha" class="btn btn-outline-success btn-lg">+</button>
+                              {% else %}
+                              <button type="button" id="remover-linha" class="btn btn-outline-danger btn-lg">-</button>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                {% endfor %}
                 {% else %}
                     <div class="mesas">
                         <div class="row">
@@ -85,18 +85,14 @@
                 </div>
                 <div class="row">
                   <div class="col">
-                    <div class="mb-3">
-                      <label for="txt_module_width" class="form-label">Largura do Modulo</label>
-                      <input type="number" step="1" class="form-control" name="txt_module_width" value="{{power_plant.module.largura}}">
-                      <div class="form-text">Insira a Largura do Módulo (lado menor).</div>
-                    </div>
+                    <select class="form-select form-select-lg mb-3" name="slcModuleBrand" id="slcModuleBrand">
+                      <option value="" selected>Selecione uma Marca</option>
+                    </select>
                   </div>
                   <div class="col">
-                    <div class="mb-3">
-                      <label for="txt_module_power" class="form-label">Potência do Modulo</label>
-                      <input type="number" step="1" class="form-control" name="txt_module_power" value="{{power_plant.module.potencia}}">
-                      <div class="form-text">Insira a Potencia do Módulo [W].</div>
-                    </div>
+                    <select class="form-select form-select-lg mb-3" name="slcModuleModel" id="slcModuleModel">
+                      <option value="" selected>Selecione um Módulo</option>
+                    </select>
                   </div>
                 </div>
                 <div class="row">
@@ -248,7 +244,35 @@
 {% endif %}
 </div>
 <script>
-    var linhasContainer = document.getElementById('linhas-container');
+    const linhasContainer = document.getElementById('linhas-container');
+    const selectBrands = document.getElementById('slcModuleBrand');
+    const selectModules = document.getElementById('slcModuleModel');
+
+    var brands = JSON.parse('{{ brands | escapejs }}');
+    var components = JSON.parse('{{ components | escapejs }}');
+
+    // console.log(brands)
+    // console.log(components)
+
+    brands.forEach(brand => {
+      let option = document.createElement('option');
+      option.text = brand.fields.name;
+      option.value = brand.pk;
+      selectBrands.add(option);
+    });
+
+    selectBrands.addEventListener('blur', function(){
+      let marcaSelecionada = this.value;
+      selectModules.innerHTML = '<option value="" selected>Selecione um Módulo</option>'
+      components.forEach(component => {
+      if(component.fields.brand == marcaSelecionada){
+        let option = document.createElement('option');
+        option.text = component.fields.descricao;
+        option.value = component.pk;
+        selectModules.append(option);
+      }
+      });
+    })
 
     linhasContainer.addEventListener('click', function(event) {
         // Verifica se o elemento clicado é um botão de adição

@@ -1,10 +1,11 @@
 import math
-from calculibrium.model.component import Inverter, Module
+from calculibrium.model.component import Inverter
 from calculibrium.model.table import Table
 from calculibrium.model.structure import Structure
+from calculibrium.models import DBComponent
 
 class PowerPlant:
-    def __init__(self, customer: str, module: Module, power: float, inverter_table: bool = False, inverter: Inverter = None):
+    def __init__(self, customer: str, module: DBComponent, power: float, inverter_table: bool = False, inverter: Inverter = None):
         self.customer = customer
         self.module = module
         self.inverter = inverter
@@ -17,8 +18,8 @@ class PowerPlant:
         self.structures = None
 
     def calc_modules_amount(self):
-        self.modules_amount = round(self.power/(self.module.potencia/1e3)/3)*3
-        self.real_power = self.modules_amount*self.module.potencia/1e3
+        self.modules_amount = round(self.power/(float(self.module.potencia)/1e3)/3)*3
+        self.real_power = self.modules_amount*float(self.module.potencia)/1e3
 
     def calc_structure(self):
         arr = []
@@ -52,6 +53,6 @@ class PowerPlant:
         
 
 if __name__ == '__main__':
-    power_plant = PowerPlant('Rafael Chang', Module(0,0,0,0,0,0,0,0,540,2261,1134,35,0,0,0,0), 105.00)
+    power_plant = PowerPlant('Rafael Chang', DBComponent.objects.get(cdcrm=1750512), 105.00)
     power_plant.calc_structure()
     print(power_plant.table.tables)

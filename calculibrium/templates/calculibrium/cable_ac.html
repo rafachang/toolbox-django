@@ -75,9 +75,7 @@
     adicionarLinha('add');
     linhasContainer.addEventListener('click', function(event) {
         if (event.target.id === 'remover-linha') {
-            // Obtém o elemento pai (div com a classe 'mesas') do botão clicado
             var linhaRemovida = event.target.closest('.inversores');
-            // Remove a linha do DOM
             linhaRemovida.remove();
         }
     });
