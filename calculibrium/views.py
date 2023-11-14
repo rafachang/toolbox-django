@@ -1,4 +1,4 @@
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.core.handlers.wsgi import WSGIRequest
 from django.core import serializers
 from django.core.exceptions import FieldError
@@ -10,6 +10,15 @@ from .models import DBComponent, DBBrand
 
 def index(request: WSGIRequest):
     return render(request, "calculibrium/index.html")
+
+def change_theme(request: WSGIRequest):
+    theme = request.session.get('theme', 'light')
+    if theme == 'light':
+        request.session['theme'] = 'dark'
+    else:
+        request.session['theme'] = 'light'
+    print(theme)
+    return JsonResponse({'success': True})
 
 def list(request: WSGIRequest, categoria_componente):
     try:
