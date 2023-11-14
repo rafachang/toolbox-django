@@ -85,13 +85,15 @@
                 </div>
                 <div class="row">
                   <div class="col">
+                    <label for="slcModuleBrand" class="form-label">Marca</label>
                     <select class="form-select form-select-lg mb-3" name="slcModuleBrand" id="slcModuleBrand">
-                      <option value="" selected>Selecione uma Marca</option>
+                      <option value="" selected>Selecione a Marca do Módulo</option>
                     </select>
                   </div>
                   <div class="col">
+                    <label for="slcModuleModel" class="form-label">Modelo</label>
                     <select class="form-select form-select-lg mb-3" name="slcModuleModel" id="slcModuleModel">
-                      <option value="" selected>Selecione um Módulo</option>
+                      <option value="" selected>Selecione o Modelo do Módulo</option>
                     </select>
                   </div>
                 </div>
@@ -186,7 +188,7 @@
               <td>kWp</td>
             </tr>
             <tr>
-              <td>Quantidade Total de Módulos</td>
+              <td>{{power_plant.module}}</td>
               <td>{{power_plant.modules_amount}}</td>
               <td>un</td>
             </tr>
@@ -247,7 +249,6 @@
     const linhasContainer = document.getElementById('linhas-container');
     const selectBrands = document.getElementById('slcModuleBrand');
     const selectModules = document.getElementById('slcModuleModel');
-
     var brands = JSON.parse('{{ brands | escapejs }}');
     var components = JSON.parse('{{ components | escapejs }}');
 
@@ -258,21 +259,33 @@
       let option = document.createElement('option');
       option.text = brand.fields.name;
       option.value = brand.pk;
+      if('{{ power_plant.structures }}' == 'None'){
+        option.selected = (brand.pk == 3) ? true : false;
+      } else{
+        option.selected = (brand.fields.name == '{{ power_plant.module.brand }}') ? true : false;
+      }
       selectBrands.add(option);
     });
+    populate_components();
+    selectBrands.addEventListener('blur', populate_components);
 
-    selectBrands.addEventListener('blur', function(){
-      let marcaSelecionada = this.value;
-      selectModules.innerHTML = '<option value="" selected>Selecione um Módulo</option>'
+    function populate_components(){
+      let marcaSelecionada = selectBrands.value;
+      selectModules.innerHTML = '<option value="" selected>Selecione o Modelo do Módulo</option>'
       components.forEach(component => {
       if(component.fields.brand == marcaSelecionada){
         let option = document.createElement('option');
         option.text = component.fields.descricao;
         option.value = component.pk;
+        if('{{ power_plant.structures }}' == 'None'){
+          option.selected = (component.pk == 249) ? true : false;
+        } else{
+          option.selected = (component.pk == '{{ power_plant.module.component_id }}') ? true : false;
+        }
         selectModules.append(option);
       }
       });
-    })
+    }
 
     linhasContainer.addEventListener('click', function(event) {
         // Verifica se o elemento clicado é um botão de adição

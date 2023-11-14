@@ -3,7 +3,6 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.core import serializers
 from django.core.exceptions import FieldError
 from django.shortcuts import render
-import json
 from calculibrium.model.power_plant import PowerPlant
 from calculibrium.model.component import Module
 from .models import DBComponent, DBBrand
@@ -28,22 +27,32 @@ def list(request: WSGIRequest, categoria_componente):
     return render(request, "calculibrium/list.html", {"list": list})
 
 def structure_kwp(request: WSGIRequest):
-    power_plant = PowerPlant('Rafael Chang', Module(0,0,0,0,0,0,0,0,540,2261,1134,35,0,0,0,0), 103.68)
+    componentes = DBComponent.objects.filter(categoria_componente='PN', largura__gt=0)
+    marcas = DBBrand.objects.filter(dbcomponent__in=componentes).distinct()
+    marcas_json = serializers.serialize('json', marcas)
+    componentes_json = serializers.serialize('json', componentes)
+    power_plant = PowerPlant('Rafael Chang', DBComponent.objects.get(cdcrm=1750512), 103.68)
     if request.method == 'POST':
         items = {}
         for chave, valor in request.POST.items():
             items[chave] = valor
+        module = DBComponent.objects.get(pk=items['slcModuleModel'])
         power_plant = PowerPlant(items['txt_customers_name'], 
-                                 Module(0,0,0,0,0,0,0,0,int(items['txt_module_power']), 2261, int(items['txt_module_width']), 35, 0, 0, 0, 0),
+                                 module,
                                  float(items['txt_power_plant_power']))
         # power_plant.inverter_table = True if items['chk_inverter'] else False
         power_plant.inverter_table = True if request.POST.get('chk_inverter') else False
         power_plant.calc_structure()
         power_plant.calc_concrete(1.6, 0.15, 0.4, 0.2)
-    return render(request, "calculibrium/structure_kwp.html", {"power_plant": power_plant})
+    return render(request, "calculibrium/structure_kwp.html", 
+                  {
+                    "power_plant": power_plant,
+                    'brands': marcas_json,
+                    'components': componentes_json,
+                   })
 
 def structure_un(request: WSGIRequest):
-    componentes = DBComponent.objects.filter(categoria_componente='PN')
+    componentes = DBComponent.objects.filter(categoria_componente='PN', largura__gt=0)
     marcas = DBBrand.objects.filter(dbcomponent__in=componentes).distinct()
     marcas_json = serializers.serialize('json', marcas)
     componentes_json = serializers.serialize('json', componentes)

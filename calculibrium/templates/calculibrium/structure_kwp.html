@@ -21,18 +21,16 @@
           </div>
           <div class="row">
             <div class="col">
-              <div class="mb-3">
-                <label for="txt_module_width" class="form-label">Largura do Modulo</label>
-                <input type="number" step="1" class="form-control" name="txt_module_width" value="{{power_plant.module.largura}}">
-                <div class="form-text">Insira a Largura do Módulo (lado menor).</div>
-              </div>
+              <label for="slcModuleBrand" class="form-label">Marca</label>
+              <select class="form-select form-select-lg mb-3" name="slcModuleBrand" id="slcModuleBrand">
+                <option value="" selected>Selecione a Marca do Módulo</option>
+              </select>
             </div>
             <div class="col">
-              <div class="mb-3">
-                <label for="txt_module_power" class="form-label">Potência do Modulo</label>
-                <input type="number" step="1" class="form-control" name="txt_module_power" value="{{power_plant.module.potencia}}">
-                <div class="form-text">Insira a Potencia do Módulo [W].</div>
-              </div>
+              <label for="slcModuleModel" class="form-label">Modelo</label>
+              <select class="form-select form-select-lg mb-3" name="slcModuleModel" id="slcModuleModel">
+                <option value="" selected>Selecione o Modelo do Módulo</option>
+              </select>
             </div>
             <div class="col">
               <div class="mb-3">
@@ -190,4 +188,45 @@
     </div>
   {% endif %}
 </div>
+<script>
+    const selectBrands = document.getElementById('slcModuleBrand');
+    const selectModules = document.getElementById('slcModuleModel');
+    var brands = JSON.parse('{{ brands | escapejs }}');
+    var components = JSON.parse('{{ components | escapejs }}');
+
+    // console.log(brands)
+    // console.log(components)
+
+    brands.forEach(brand => {
+      let option = document.createElement('option');
+      option.text = brand.fields.name;
+      option.value = brand.pk;
+      if('{{ power_plant.structures }}' == 'None'){
+        option.selected = (brand.pk == 3) ? true : false;
+      } else{
+        option.selected = (brand.fields.name == '{{ power_plant.module.brand }}') ? true : false;
+      }
+      selectBrands.add(option);
+    });
+    populate_components();
+    selectBrands.addEventListener('blur', populate_components);
+
+    function populate_components(){
+      let marcaSelecionada = selectBrands.value;
+      selectModules.innerHTML = '<option value="" selected>Selecione o Modelo do Módulo</option>'
+      components.forEach(component => {
+      if(component.fields.brand == marcaSelecionada){
+        let option = document.createElement('option');
+        option.text = component.fields.descricao;
+        option.value = component.pk;
+        if('{{ power_plant.structures }}' == 'None'){
+          option.selected = (component.pk == 249) ? true : false;
+        } else{
+          option.selected = (component.pk == '{{ power_plant.module.component_id }}') ? true : false;
+        }
+        selectModules.append(option);
+      }
+      });
+    }
+</script>
 {% endblock content %}
