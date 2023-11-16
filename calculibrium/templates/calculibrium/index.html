@@ -1,1 +1,30 @@
 {% extends "calculibrium/base.html" %}
+
+{% block title %}
+  Home
+{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <h3 class="card-header">Comercial</h3>
+        <div class="card-body">
+            <dl>
+                <dt>Estrutura</dt>
+                <dd>Calcula os componentes utilizados na estrutura pela potência da usina em kWp</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="card">
+        <h3 class="card-header">Engenharia</h3>
+        <div class="card-body">
+            <dl>
+                <dt>Estrutura [kWp]</dt>
+                <dd>Calcula os componentes utilizados na estrutura pela potência da usina em kWp</dd>
+                <dt>Estrutura [un]</dt>
+                <dd>Calcula os componentes utilizados na estrutura pelo arranjo de mesas</dd>
+            </dl>
+        </div>
+    </div>
+</div>
+{% endblock content %}

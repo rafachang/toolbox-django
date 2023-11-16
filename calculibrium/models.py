@@ -1,8 +1,25 @@
 from audioop import reverse
 from django.db import models
 from django.forms.models import model_to_dict
+from django.contrib.postgres.fields import ArrayField
 
 # Create your models here.
+
+class DBVoltage(models.Model):
+
+    voltage_id = models.AutoField(primary_key=True)
+    phase_to_phase = models.IntegerField()
+    phase_to_neutral = models.IntegerField()
+
+    class Meta:
+        verbose_name = ("DBVoltage")
+        verbose_name_plural = ("DBVoltages")
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("DBVoltage_detail", kwargs={"pk": self.pk})
 
 class DBBrand(models.Model):
 
@@ -69,6 +86,74 @@ class DBComponent(models.Model):
 
     def to_dict(self):
         return model_to_dict(self)
+
+class DBInverter(models.Model):
+    inverter_id = models.AutoField(primary_key=True)
+    brand = models.ForeignKey(DBBrand, on_delete=models.CASCADE)
+    component = models.ForeignKey(DBComponent, on_delete=models.CASCADE)
+    model = models.CharField(max_length=100)
+
+    cc_max_pv_power = models.IntegerField()
+    cc_max_input_voltage = models.IntegerField()
+    cc_startup_input_voltage = models.IntegerField()
+    cc_num_mppt = models.IntegerField()
+    cc_mppt_voltage_range_min = models.IntegerField()
+    cc_mppt_voltage_range_max = models.IntegerField()
+    cc_max_input_current = models.IntegerField()
+    cc_max_short_circuit_current = models.IntegerField()
+    cc_num_inputs = ArrayField(models.IntegerField())
+    
+    ca_power = models.IntegerField()
+    ca_max_power = models.IntegerField()
+    ca_voltage = models.ForeignKey(DBVoltage, on_delete=models.PROTECT)
+    ca_connection_type = models.CharField(max_length=3)
+    ca_current = models.DecimalField(max_digits=5, decimal_places=2)
+    ca_max_current = models.DecimalField(max_digits=5, decimal_places=2)
+
+    length = models.IntegerField()
+    width = models.IntegerField()
+    height = models.IntegerField()
+    weight = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    
+
+    class Meta:
+        verbose_name = ("DBInverter")
+        verbose_name_plural = ("DBInverter")
+
+    def __str__(self):
+        return self.model
+
+    def get_absolute_url(self):
+        return reverse("DBInverter", kwargs={"pk": self.pk})
+
+class DBModule(models.Model):
+    module_id = models.AutoField(primary_key=True)
+    brand = models.ForeignKey(DBBrand, on_delete=models.CASCADE)
+    component = models.ForeignKey(DBComponent, on_delete=models.CASCADE, null=True)
+    model = models.CharField(max_length=100)
+    nominal_power = models.IntegerField()
+    operating_voltage = models.DecimalField(max_digits=5, decimal_places=2)
+    operating_current = models.DecimalField(max_digits=5, decimal_places=2)
+    open_circuit_voltage = models.DecimalField(max_digits=5, decimal_places=2)
+    short_circuit_current = models.DecimalField(max_digits=5, decimal_places=2)
+    max_system_voltage = models.DecimalField(max_digits=10, decimal_places=2)
+    length = models.IntegerField()
+    width = models.IntegerField()
+    height = models.IntegerField()
+    weight = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    
+
+    class Meta:
+        verbose_name = ("DBModule")
+        verbose_name_plural = ("DBModules")
+
+    def __str__(self):
+        return (self.nominal_power + ', ' + self.model)
+
+    def get_absolute_url(self):
+        return reverse("DBModule_detail", kwargs={"pk": self.pk})
 
 class DBCustomer(models.Model):
 

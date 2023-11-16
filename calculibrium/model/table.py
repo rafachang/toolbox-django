@@ -85,12 +85,12 @@ class Table:
         # self.electrode = math.ceil(ring_length/12e3)*rows_amount
         ring_length = self.tables['dimensions'][1]+2e3
         ring_perimeter = 2*(ring_length+ring_width)
-        middle_connections = math.ceil(sum(self.tables['qtd_mesas'])/3) if sum(self.tables['qtd_mesas']) >= 3 else 0
-        self.cable_length = (ring_perimeter+middle_connections*ring_length)/1e3
+        middle_connections = math.ceil((sum(self.tables['qtd_mesas'])-2)/2) if sum(self.tables['qtd_mesas']) >= 3 else 0
         self.electrode = (middle_connections+2)*math.floor(ring_length/2e4)+(sum(self.tables['qtd_mesas'])-1)*2+4
         self.elcectodes_connector = self.electrode
-        self.foundation_connector = self.elcectodes_connector-middle_connections
+        self.foundation_connector = 2*(middle_connections+2)*math.floor(ring_length/2e4)
         self.splitbolt = self.electrode
+        self.cable_length = (ring_perimeter+middle_connections*ring_length)/1e3
 
     def __str__(self) -> str:
         return 'módulos: '+str(self.tables['qtd_modulo'])+'\nmesas: '+str(self.tables['qtd_mesas'])

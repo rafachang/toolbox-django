@@ -4,7 +4,7 @@ from django.core import serializers
 from django.core.exceptions import FieldError
 from django.shortcuts import render
 from calculibrium.model.power_plant import PowerPlant
-from calculibrium.model.component import Module
+from calculibrium.model.roof import Roof
 from .models import DBComponent, DBBrand
 
 def index(request: WSGIRequest):
@@ -16,7 +16,6 @@ def change_theme(request: WSGIRequest):
         request.session['theme'] = 'dark'
     else:
         request.session['theme'] = 'light'
-    print(theme)
     return JsonResponse({'success': True})
 
 def list(request: WSGIRequest, categoria_componente):
@@ -25,6 +24,32 @@ def list(request: WSGIRequest, categoria_componente):
     except DBComponent.DoesNotExist:
         raise Http404('Component does not exist!')
     return render(request, "calculibrium/list.html", {"list": list})
+
+def select(request: WSGIRequest, categoria_componente):
+    componentes = DBComponent.objects.filter(categoria_componente=categoria_componente)
+    marcas = DBBrand.objects.filter(dbcomponent__in=componentes).distinct()
+    marcas_json = serializers.serialize('json', marcas)
+    componentes_json = serializers.serialize('json', componentes)
+    if request.method == 'POST':
+        print(request.POST.getlist('container-inverters'))
+    return render(request, 'calculibrium/cable_ac.html', {'marcas_json': marcas_json, 'componentes_json': componentes_json})
+
+
+def inverter(request: WSGIRequest):
+    componentes = DBComponent.objects.filter(categoria_componente='IN')
+    marcas = DBBrand.objects.filter(dbcomponent__in=componentes).distinct()
+    marcas_json = serializers.serialize('json', marcas)
+    componentes_json = serializers.serialize('json', componentes)
+    return render(request, 'calculibrium/inverter.html',
+                  {
+                      'marcas_json': marcas_json,
+                      'componentes_json': componentes_json,
+                  });
+
+
+def roof_disponibilization(request: WSGIRequest):
+    roof = Roof(DBComponent.objects.get(cdcrm=1750512), 93)
+    return render(request, "calculibrium/index.html")
 
 def structure_kwp(request: WSGIRequest):
     componentes = DBComponent.objects.filter(categoria_componente='PN', largura__gt=0)
@@ -91,13 +116,4 @@ def structure_un(request: WSGIRequest):
                       'brands': marcas_json,
                       'components': componentes_json
                       })
-
-def select(request: WSGIRequest, categoria_componente):
-    componentes = DBComponent.objects.filter(categoria_componente=categoria_componente)
-    marcas = DBBrand.objects.filter(dbcomponent__in=componentes).distinct()
-    marcas_json = serializers.serialize('json', marcas)
-    componentes_json = serializers.serialize('json', componentes)
-    if request.method == 'POST':
-        print(request.POST.getlist('container-inverters'))
-    return render(request, 'calculibrium/cable_ac.html', {'marcas_json': marcas_json, 'componentes_json': componentes_json})
 
