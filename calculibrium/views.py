@@ -1,13 +1,19 @@
+import json
 from django.http import Http404, JsonResponse
 from django.core.handlers.wsgi import WSGIRequest
 from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.exceptions import FieldError
 from django.shortcuts import render
+import pandas as pd
 from calculibrium.model.power_plant import PowerPlant
 from calculibrium.model.roof import Roof
-from .models import DBComponent, DBBrand
+from calculibrium.model.inverter import get_cheaper
+from calculibrium.model.table import Table
+from .models import DBComponent, DBBrand, DecimalEncoder
 
 def index(request: WSGIRequest):
+    
     return render(request, "calculibrium/index.html")
 
 def change_theme(request: WSGIRequest):
@@ -34,7 +40,6 @@ def select(request: WSGIRequest, categoria_componente):
         print(request.POST.getlist('container-inverters'))
     return render(request, 'calculibrium/cable_ac.html', {'marcas_json': marcas_json, 'componentes_json': componentes_json})
 
-
 def inverter(request: WSGIRequest):
     componentes = DBComponent.objects.filter(categoria_componente='IN')
     marcas = DBBrand.objects.filter(dbcomponent__in=componentes).distinct()
@@ -44,8 +49,12 @@ def inverter(request: WSGIRequest):
                   {
                       'marcas_json': marcas_json,
                       'componentes_json': componentes_json,
-                  });
+                  })
 
+def find_inverter(request: WSGIRequest):
+    inv = get_cheaper(203.68)
+    json_data = json.dumps(inv, cls=DjangoJSONEncoder)
+    return JsonResponse({'data': json_data})
 
 def roof_disponibilization(request: WSGIRequest):
     roof = Roof(DBComponent.objects.get(cdcrm=1750512), 93)

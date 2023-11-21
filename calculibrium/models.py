@@ -1,9 +1,17 @@
 from audioop import reverse
 from django.db import models
 from django.forms.models import model_to_dict
-from django.contrib.postgres.fields import ArrayField
+from django.core.serializers.json import DjangoJSONEncoder
+from decimal import Decimal
 
 # Create your models here.
+
+class DecimalEncoder(DjangoJSONEncoder):
+    def default(self, o):
+        if isinstance(o, Decimal):
+            return str(o)
+        return super(DecimalEncoder, self).default(o)
+
 
 class DBVoltage(models.Model):
 
@@ -89,31 +97,35 @@ class DBComponent(models.Model):
 
 class DBInverter(models.Model):
     inverter_id = models.AutoField(primary_key=True)
-    brand = models.ForeignKey(DBBrand, on_delete=models.CASCADE)
-    component = models.ForeignKey(DBComponent, on_delete=models.CASCADE)
+    brand = models.ForeignKey(DBBrand, on_delete=models.CASCADE, default=20)
+    component = models.ForeignKey(DBComponent, on_delete=models.CASCADE, default=1)
     model = models.CharField(max_length=100)
 
-    cc_max_pv_power = models.IntegerField()
-    cc_max_input_voltage = models.IntegerField()
-    cc_startup_input_voltage = models.IntegerField()
-    cc_num_mppt = models.IntegerField()
-    cc_mppt_voltage_range_min = models.IntegerField()
-    cc_mppt_voltage_range_max = models.IntegerField()
-    cc_max_input_current = models.IntegerField()
-    cc_max_short_circuit_current = models.IntegerField()
-    cc_num_inputs = ArrayField(models.IntegerField())
+    cc_max_pv_power = models.DecimalField(max_digits=10, decimal_places=2)
+    cc_max_input_voltage = models.DecimalField(max_digits=10, decimal_places=2)
+    cc_startup_input_voltage = models.IntegerField(default=0)
+    cc_mppt_voltage_range_min = models.IntegerField(default=0)
+    cc_mppt_voltage_range_max = models.IntegerField(default=0)
+    cc_max_input_current = models.DecimalField(max_digits=10, decimal_places=2)
+    cc_max_short_circuit_current = models.DecimalField(max_digits=10, decimal_places=2)
+    cc_num_mppt = models.IntegerField(default=0)
+    cc_mppt_desbalanced = models.BooleanField(default=0)
+    cc_isc_max_main = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    ca_isc_max_secundary = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    cc_num_inputs = models.IntegerField(default=0)
+    cc_num_inputs_main = models.IntegerField(null=True)
+    cc_num_inputs_secundary = models.IntegerField(null=True)
     
-    ca_power = models.IntegerField()
-    ca_max_power = models.IntegerField()
-    ca_voltage = models.ForeignKey(DBVoltage, on_delete=models.PROTECT)
+    ca_power = models.DecimalField(max_digits=10, decimal_places=2)
+    ca_voltage = models.ForeignKey(DBVoltage, on_delete=models.PROTECT, default=0)
     ca_connection_type = models.CharField(max_length=3)
-    ca_current = models.DecimalField(max_digits=5, decimal_places=2)
-    ca_max_current = models.DecimalField(max_digits=5, decimal_places=2)
+    ca_current = models.DecimalField(max_digits=10, decimal_places=2)
+    ca_max_current = models.DecimalField(max_digits=10, decimal_places=2)
 
-    length = models.IntegerField()
-    width = models.IntegerField()
-    height = models.IntegerField()
-    weight = models.DecimalField(max_digits=10, decimal_places=2)
+    length = models.DecimalField(max_digits=10, decimal_places=2)
+    width = models.DecimalField(max_digits=10, decimal_places=2)
+    height = models.DecimalField(max_digits=10, decimal_places=2)
+    weight = models.DecimalField(max_digits=6, decimal_places=2)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     
 
@@ -132,6 +144,7 @@ class DBModule(models.Model):
     brand = models.ForeignKey(DBBrand, on_delete=models.CASCADE)
     component = models.ForeignKey(DBComponent, on_delete=models.CASCADE, null=True)
     model = models.CharField(max_length=100)
+    bifacial = models.BooleanField(default=False)
     nominal_power = models.IntegerField()
     operating_voltage = models.DecimalField(max_digits=5, decimal_places=2)
     operating_current = models.DecimalField(max_digits=5, decimal_places=2)
@@ -150,7 +163,7 @@ class DBModule(models.Model):
         verbose_name_plural = ("DBModules")
 
     def __str__(self):
-        return (self.nominal_power + ', ' + self.model)
+        return (str(self.nominal_power) + ', ' + self.model)
 
     def get_absolute_url(self):
         return reverse("DBModule_detail", kwargs={"pk": self.pk})

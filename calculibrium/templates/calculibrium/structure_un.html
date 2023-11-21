@@ -6,9 +6,24 @@
 
 {% block content %}
 <div class="container">
+  <div class="card">
+    <h3 class="card-header">Entenda os Cálculos</h3>
+    <div class="card-body">
+      <p>A estrutura é projetada com base no arranjo de mesas fornecido, seguindo premissas específicas:</p>
+    
+      <ul>
+        <li>Utilização da Estrutura Soufer para cálculos;</li>
+        <li>Contraventamentos a cada 3~4 vãos;</li>
+        <li>Balanço máximo dos módulos limitado a 1,2 metros.</li>
+      </ul>
+    
+      <p>Estas considerações são fundamentais para garantir a estabilidade e eficiência da estrutura.</p>
+    
+  </div>
+</div>
 <form method="post">
     {% csrf_token %}
-    <div class="card" style="width: 80rem;">
+    <div class="card">
         <h3 class="card-header">Selecione as Mesas</h3>
         <div class="card-body">
             <div class="container" id="linhas-container">
@@ -72,7 +87,7 @@
             </div>
         </div>
     </div>
-    <div class="card" style="width: 80rem;">
+    <div class="card">
         <h3 class="card-header">Entradas da Usina</h3>
         <div class="card-body">
             <div class="container">
@@ -110,7 +125,7 @@
               </div>
         </div>
     </div>
-    <div class="card" style="width: 80rem;">
+    <div class="card">
         <h3 class="card-header">Concreto</h3>
         <div class="card-body">
           <div class="container">
@@ -168,7 +183,7 @@
     </div>
 </form>
 {% if power_plant.structures %}
-<div class="card" style="width: 80rem;">
+<div class="card">
   <h3 class="card-header">Outputs</h3>
   <div class="card-body">
     <div class="container">

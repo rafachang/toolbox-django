@@ -10,6 +10,7 @@ urlpatterns = [
     path("<str:categoria_componente>/select", views.select, name="select"),
 
     path("inverter", views.inverter, name="inverter"),
+    path("find-inverter", views.find_inverter, name="find_inverter"),
     
     path("roof_disponibilization", views.roof_disponibilization, name="roof_disponibilization"),
     path("structure/kwp", views.structure_kwp, name="structure_kwp"),

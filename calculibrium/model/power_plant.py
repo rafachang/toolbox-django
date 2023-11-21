@@ -1,11 +1,10 @@
 import math
-from calculibrium.model.component import Inverter
 from calculibrium.model.table import Table
 from calculibrium.model.structure import Structure
 from calculibrium.models import DBComponent
 
 class PowerPlant:
-    def __init__(self, customer: str, module: DBComponent, power: float, inverter_table: bool = False, inverter: Inverter = None):
+    def __init__(self, customer: str, module: DBComponent, power: float, inverter_table: bool = False, inverter = None):
         self.customer = customer
         self.module = module
         self.inverter = inverter

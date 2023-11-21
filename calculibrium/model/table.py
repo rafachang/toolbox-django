@@ -1,13 +1,10 @@
 import math
 import pandas as pd
-if __name__ == '__main__':
-    from component import Module
-else:
-    from calculibrium.model.component import Module
+from calculibrium.models import DBComponent
 
 
 class Table:
-    def __init__(self, module: Module, module_amount: int):
+    def __init__(self, module: DBComponent, module_amount: int):
         self.module = module
         self.module_amount = module_amount
         self.power_plant_power = self.module_amount*(self.module.potencia/1000)
@@ -88,9 +85,9 @@ class Table:
         middle_connections = math.ceil((sum(self.tables['qtd_mesas'])-2)/2) if sum(self.tables['qtd_mesas']) >= 3 else 0
         self.electrode = (middle_connections+2)*math.floor(ring_length/2e4)+(sum(self.tables['qtd_mesas'])-1)*2+4
         self.elcectodes_connector = self.electrode
-        self.foundation_connector = 2*(middle_connections+2)*math.floor(ring_length/2e4)
+        self.foundation_connector = 2*(middle_connections+2)*math.ceil(ring_length/2e4)
         self.splitbolt = self.electrode
-        self.cable_length = (ring_perimeter+middle_connections*ring_length)/1e3
+        self.cable_length = ((ring_perimeter+middle_connections*ring_length)/1e3)+(6*self.foundation_connector)
 
     def __str__(self) -> str:
         return 'módulos: '+str(self.tables['qtd_modulo'])+'\nmesas: '+str(self.tables['qtd_mesas'])
@@ -100,7 +97,7 @@ if __name__ == '__main__':
     arr = []
     for i in range(700):
         dict = {}
-        table = Table(Module(0,0,0,0,0,0,0,0,540,2261,1134,35,0,0,0,0), i*3)
+        table = Table(DBComponent.objects.get(cdcrm=1750512), i*3)
         dict['power_power_plant'] = round(540*3*i/1e3, 2)
         dict['total_modules'] = 3*i
         dict['modules_amount'] = table.tables['qtd_modulo']

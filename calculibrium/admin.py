@@ -1,5 +1,5 @@
 from django.contrib import admin
-from calculibrium.models import DBComponent, DBBrand, DBCustomer, DBOrder, DBPowerPlant, DBInverter, DBModule, DBVoltage
+from calculibrium.models import DBComponent, DBBrand, DBCustomer, DBInverter, DBOrder, DBPowerPlant, DBModule, DBVoltage
 
 admin.site.register(DBComponent)
 admin.site.register(DBBrand)
