@@ -228,25 +228,34 @@
         </table>
       </div>
       <div class="row">
+        <h3>Estrutura</h3>
         <table class="table">
           <thead>
             <tr>
               <th scope="col">Código</th>
               <th scope="col">Descrição</th>
-              {% for i in power_plant.array_tables %}
-                <th>Quantidade</th>
-              {% endfor %}
               <th scope="col">Total</th>
             </tr>
           </thead>
           <tbody>
+            <tr>
+              <td colspan="3"><center><strong><h3>Estrutura</h3></strong></center></td>
+            </tr>
             {% for key, value in power_plant.structure_total.bom.items %}
               <tr>
                 <th>{{key}}</th>
                 <th>{{value.descricao}}</th>
-                {% for i in power_plant.structures %}
-                <th>{{i.bom|dictKeyLookupQuantidade:key}}</th>
-                {% endfor %}
+                <th>{{power_plant.structure_total.bom|dictKeyLookupQuantidade:key}}</th>
+              </tr>
+            {% endfor %}
+            <tr>
+              <td colspan="3"><center><strong><h3>Aterramento</h3></strong></center></td>
+            </tr>
+            {% for key in grounding.componentes %}
+              <tr>
+                <th>{{key}}</th>
+                <th>{{grounding.componentes|dictKeyLookupDescricao:key}}</th>
+                <th>{{grounding.componentes|dictKeyLookupQuantidade:key}}</th>
               </tr>
             {% endfor %}
           </tbody>

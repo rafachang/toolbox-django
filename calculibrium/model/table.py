@@ -1,3 +1,4 @@
+import json
 import math
 import pandas as pd
 from calculibrium.models import DBComponent
@@ -91,7 +92,22 @@ class Table:
 
     def __str__(self) -> str:
         return 'módulos: '+str(self.tables['qtd_modulo'])+'\nmesas: '+str(self.tables['qtd_mesas'])
-        
+
+    @property
+    def grounding(self):
+        aux = DBComponent.objects.get(cdcrm=2170510)
+        print(aux)
+        return {
+            'descricao': 'Retornando os componentes adicionados no BOM',
+            'componentes': {
+                '2170510': {'descricao': DBComponent.objects.get(cdcrm=2170510), 'quantidade': round(self.cable_length, 2)},
+                '1502204': {'descricao': DBComponent.objects.get(cdcrm=1502204), 'quantidade': round(self.electrode, 0)},
+                '1502203': {'descricao': DBComponent.objects.get(cdcrm=1502203), 'quantidade': round(self.elcectodes_connector, 0)},
+                '1502201': {'descricao': DBComponent.objects.get(cdcrm=1502201), 'quantidade': round(self.foundation_connector, 0)},
+                '1502005': {'descricao': DBComponent.objects.get(cdcrm=1502005), 'quantidade': round(self.splitbolt, 0)},
+            }
+        }
+
 if __name__ == '__main__':
     # table = Table(Module(0,0,0,0,0,0,0,0,540,2261,1134,35,0,0,0,0), 699*3)
     arr = []

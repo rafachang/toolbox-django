@@ -81,6 +81,7 @@ def structure_kwp(request: WSGIRequest):
     return render(request, "calculibrium/structure_kwp.html", 
                   {
                     "power_plant": power_plant,
+                    "grounding": power_plant.table.grounding,
                     'brands': marcas_json,
                     'components': componentes_json,
                    })
@@ -108,12 +109,14 @@ def structure_un(request: WSGIRequest):
         power_plant.real_power = power_plant.modules_amount*float(power_plant.module.potencia)/1e3
         power_plant.table.tables['qtd_modulo'] = modules_amount
         power_plant.table.tables['qtd_mesas'] = tables_amount
-        power_plant.table.tables['dimensions'] = None
+        power_plant.table.tables['dimensions'] = power_plant.table.calculate_dimensions(max(modules_amount), sum(tables_amount))
         power_plant.inverter_table = True if request.POST.get('chk_inverter') else False
+        power_plant.table.calc_grounding()
         power_plant.calc_structure()
         power_plant.calc_concrete(1.6, 0.15, 0.4, 0.2)
         return render(request, "calculibrium/structure_un.html", {
             "power_plant": power_plant,
+            "grounding": power_plant.table.grounding,
             'brands': marcas_json,
             'components': componentes_json,
             "tables": zip(modules_amount, tables_amount)
