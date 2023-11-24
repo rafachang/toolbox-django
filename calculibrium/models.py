@@ -1,33 +1,8 @@
 from audioop import reverse
 from django.db import models
 from django.forms.models import model_to_dict
-from django.core.serializers.json import DjangoJSONEncoder
-from decimal import Decimal
 
 # Create your models here.
-
-class DecimalEncoder(DjangoJSONEncoder):
-    def default(self, o):
-        if isinstance(o, Decimal):
-            return str(o)
-        return super(DecimalEncoder, self).default(o)
-
-
-class DBVoltage(models.Model):
-
-    voltage_id = models.AutoField(primary_key=True)
-    phase_to_phase = models.IntegerField()
-    phase_to_neutral = models.IntegerField()
-
-    class Meta:
-        verbose_name = ("DBVoltage")
-        verbose_name_plural = ("DBVoltages")
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse("DBVoltage_detail", kwargs={"pk": self.pk})
 
 class DBBrand(models.Model):
 
@@ -35,8 +10,8 @@ class DBBrand(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
-        verbose_name = ("Brand")
-        verbose_name_plural = ("Brands")
+        verbose_name = ("Marca")
+        verbose_name_plural = ("Marcas")
 
     def __str__(self):
         return self.name
@@ -83,8 +58,8 @@ class DBComponent(models.Model):
     class Meta:
         db_table = ''
         managed = True
-        verbose_name = 'componente'
-        verbose_name_plural = 'componentes'
+        verbose_name = 'Componente'
+        verbose_name_plural = 'Componentes'
 
     def __str__(self):
         return self.descricao
@@ -95,10 +70,83 @@ class DBComponent(models.Model):
     def to_dict(self):
         return model_to_dict(self)
 
+# region Database Exclusivo site
+
+class DBMaterial(models.Model):
+
+    material_id = models.AutoField(primary_key=True)
+    description = models.CharField(max_length=50)
+    resistivity = models.FloatField(default=0)
+
+    class Meta:
+        verbose_name = ("Material")
+        verbose_name_plural = ("Materiais")
+
+    def __str__(self):
+        return self.description
+
+    def get_absolute_url(self):
+        return reverse("DBMaterial_detail", kwargs={"pk": self.pk})
+
+class DBConnection(models.Model):
+
+    connection_id = models.AutoField(primary_key=True)
+    description = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = ("Conexão")
+        verbose_name_plural = ("Conexões")
+
+    def __str__(self):
+        return self.description
+
+    def get_absolute_url(self):
+        return reverse("DBConnection_detail", kwargs={"pk": self.pk})
+
+class DBVoltage(models.Model):
+
+    voltage_id = models.AutoField(primary_key=True)
+    phase_to_phase = models.IntegerField()
+    phase_to_neutral = models.IntegerField()
+
+    class Meta:
+        verbose_name = ("Tensão")
+        verbose_name_plural = ("Tensões")
+
+    def __str__(self):
+        return str(self.phase_to_phase)+'/'+str(self.phase_to_neutral)+' V'
+
+    def get_absolute_url(self):
+        return reverse("DBVoltage_detail", kwargs={"pk": self.pk})
+
+class DBCircuitBreaker(models.Model):
+
+    circuit_breaker_id = models.AutoField(primary_key=True)
+    description = models.CharField(max_length=100)
+    brand = models.ForeignKey(DBBrand, on_delete=models.CASCADE, default=0)
+    connection_type = models.ForeignKey(DBConnection, on_delete=models.CASCADE)
+    poles = models.IntegerField()
+    current = models.FloatField()
+
+    length = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    width = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    height = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    weight = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    class Meta:
+        verbose_name = ("Circuit Breaker")
+        verbose_name_plural = ("Circuit Breakers")
+
+    def __str__(self):
+        return self.description
+
+    def get_absolute_url(self):
+        return reverse("CircuitBreaker_detail", kwargs={"pk": self.pk})
+
 class DBInverter(models.Model):
     inverter_id = models.AutoField(primary_key=True)
     brand = models.ForeignKey(DBBrand, on_delete=models.CASCADE, default=20)
-    component = models.ForeignKey(DBComponent, on_delete=models.CASCADE, default=1)
     model = models.CharField(max_length=100)
 
     cc_max_pv_power = models.DecimalField(max_digits=10, decimal_places=2)
@@ -118,7 +166,7 @@ class DBInverter(models.Model):
     
     ca_power = models.DecimalField(max_digits=10, decimal_places=2)
     ca_voltage = models.ForeignKey(DBVoltage, on_delete=models.PROTECT, default=0)
-    ca_connection_type = models.CharField(max_length=3)
+    connection_type = models.ForeignKey(DBConnection, on_delete=models.CASCADE)
     ca_current = models.DecimalField(max_digits=10, decimal_places=2)
     ca_max_current = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -130,8 +178,8 @@ class DBInverter(models.Model):
     
 
     class Meta:
-        verbose_name = ("DBInverter")
-        verbose_name_plural = ("DBInverter")
+        verbose_name = ("Inversor")
+        verbose_name_plural = ("Inversores")
 
     def __str__(self):
         return self.model
@@ -139,34 +187,54 @@ class DBInverter(models.Model):
     def get_absolute_url(self):
         return reverse("DBInverter", kwargs={"pk": self.pk})
 
+class DBCableFlex(models.Model):
+    cable_id = models.AutoField(primary_key=True)
+    description = models.CharField(max_length=50)
+    gauge = models.FloatField()
+    current = models.FloatField()
+    external_diameter = models.FloatField()
+    material = models.ForeignKey(DBMaterial, on_delete=models.CASCADE, default=0)
+
+    class Meta:
+        verbose_name = ("Cabo Flex")
+        verbose_name_plural = ("Cabos Flex")
+
+    def __str__(self):
+        return self.description
+
+    def get_absolute_url(self):
+        return reverse("DBCable", kwargs={"pk": self.pk})
+
 class DBModule(models.Model):
     module_id = models.AutoField(primary_key=True)
     brand = models.ForeignKey(DBBrand, on_delete=models.CASCADE)
-    component = models.ForeignKey(DBComponent, on_delete=models.CASCADE, null=True)
     model = models.CharField(max_length=100)
     bifacial = models.BooleanField(default=False)
     nominal_power = models.IntegerField()
-    operating_voltage = models.DecimalField(max_digits=5, decimal_places=2)
-    operating_current = models.DecimalField(max_digits=5, decimal_places=2)
-    open_circuit_voltage = models.DecimalField(max_digits=5, decimal_places=2)
-    short_circuit_current = models.DecimalField(max_digits=5, decimal_places=2)
-    max_system_voltage = models.DecimalField(max_digits=10, decimal_places=2)
+    operating_voltage = models.FloatField()
+    operating_current = models.FloatField()
+    open_circuit_voltage = models.FloatField()
+    short_circuit_current = models.FloatField()
+    max_system_voltage = models.FloatField()
     length = models.IntegerField()
     width = models.IntegerField()
     height = models.IntegerField()
-    weight = models.DecimalField(max_digits=10, decimal_places=2)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    weight = models.FloatField()
+    price = models.FloatField()
     
-
     class Meta:
-        verbose_name = ("DBModule")
-        verbose_name_plural = ("DBModules")
+        verbose_name = ("Módulo")
+        verbose_name_plural = ("Módulos")
 
     def __str__(self):
         return (str(self.nominal_power) + ', ' + self.model)
 
     def get_absolute_url(self):
         return reverse("DBModule_detail", kwargs={"pk": self.pk})
+
+# endregion
+
+# region TODO
 
 class DBCustomer(models.Model):
 
@@ -182,7 +250,6 @@ class DBCustomer(models.Model):
 
     def get_absolute_url(self):
         return reverse("Customer_detail", kwargs={"pk": self.pk})
-
 class DBPowerPlant(models.Model):
 
     power_plant_id = models.AutoField(primary_key=True)
@@ -215,3 +282,5 @@ class DBOrder(models.Model):
 
     def get_absolute_url(self):
         return reverse("Order_detail", kwargs={"pk": self.pk})
+
+# endregion

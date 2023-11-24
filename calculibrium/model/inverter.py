@@ -1,3 +1,4 @@
+import json
 from calculibrium.models import DBInverter
 from django.forms.models import model_to_dict
 from django.core.serializers import serialize
@@ -36,17 +37,24 @@ def lookfor(power_kwp):
         combinations = find_combinations(potencias, power_kwp, 0.12)
         # Get inverters based on combinations
         for combination in combinations:
-            inverter_objects = []
-            for i in combination:
+            inverter_objects = {}
+            for idx, i in enumerate(combination):
                 obj = model_to_dict(i)
-                inverter_objects.append({'pk': obj['inverter_id'], 'model': obj['model'], 'price': float(obj['price'])})
+                # print(idx)
+                inverter_objects[idx] = {'pk': obj['inverter_id'], 'model': obj['model'], 'price': float(obj['price'])}
+            total_price = 0
+            for key, value in inverter_objects.items():
+                total_price += value['price']
+            inverter_objects['total_price'] = total_price
             choices.append(inverter_objects)
-    return choices
+    if choices:
+        return choices
+    else:
+        return None
 
 def get_cheaper(power_kwp):
     combinations = lookfor(power_kwp)
-    min = combinations[0]
-    for combination in combinations:
-        if sum([inverter['price'] for inverter in min]) > sum([inverter['price'] for inverter in combination]):
-            min = combination
-    return min
+    if not combinations:
+        return None
+    min_price = min(combinations, key=lambda x: x['total_price'])
+    return min_price

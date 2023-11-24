@@ -5,6 +5,10 @@ __pycache__
 db.sqlite3
 media
 
+# folders
+
+staticfiles_build/
+
 # Environments 
 .env 
 .venv 
