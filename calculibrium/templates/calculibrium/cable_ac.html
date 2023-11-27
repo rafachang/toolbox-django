@@ -1,6 +1,5 @@
 {% extends "calculibrium/base.html" %}
 {% block content %}
-{% csrf_token %}
 <div class="container">
     <div class="card">
         <h3 class="card-header">Entenda os Cálculos</h3>
@@ -19,6 +18,7 @@
         </div>
     </div>
     <form method="post">
+    {% csrf_token %}
         <div class="card">
             <h3 class="card-header">Entradas</h3>
             <div class="card-body">
